@@ -46,43 +46,20 @@ function renderMonkeyList( monkeyList ){
 
 // attach event handler - return formData
 function attachNewMonkeyHandler(){
-    $( '.submit-monkey' ).click( function( event ){
+    $( '.monkey-form' ).submit( function( event ){
         event.preventDefault();
 
-        var formData = getNewMonkeyData( $(this) );
-        createNewMonkey( formData )
-        .then( function( newMonkey ){
+        $.post('http://localhost:8000/monkeys', $('.monkey-form').serialize() )
+        .done( function( newMonkey ){
             addNewMonkeyToList( newMonkey );
-            flashCreationMessage();
         })
-        .catch( function( error ){
+        .fail( function( error ){
             console.error( 'Unable to add monkey', error );
         });
     });
 }
 
-// get data from form - return data??
-function getNewMonkeyData( form ){
-    var formValues = form.serializeArray();
-    return formValues.reduce(function(formattedMonkey, monkey){
-        formattedMonkey[monkey.name] = monkey.value;
-        return formattedMonkey;
-    }, {});
-}
-
-// create new monkey - return promise
-function createNewMonkey(formData){
-  return $.post('http://localhost:8000/monkeys', function( data ){
-    console.log('New monkey posted');
-  });
-}
-
-
 function addNewMonkeyToList( monkey ){
     var monkeyListItem = convertMonkeyObjectToListItem( monkey );
     $( '.monkey-list' ).append( monkeyListItem );
-}
-
-function flashCreationMessage(){
-    $('.creation-message').fadeIn( 300 ).delay( 2000 ).fadeOut( 300 );
 }
